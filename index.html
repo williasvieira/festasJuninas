@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <title>Event Schedule</title>
+        <link
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+        <style>
+            .filter-container {
+                margin-bottom: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="my-4 text-center">Festas</h1>
+
+            <div class="filter-container">
+                <div class="form-row">
+                    <div class="col">
+                        <select id="diaFilter" class="form-control">
+                            <option value="">Selecione o Dia</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <select id="bandasFilter" class="form-control">
+                            <option value="">Selecione Banda</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <select id="localFilter" class="form-control">
+                            <option value="">Selecione Local</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-bordered table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th onclick="sortTable(0, 'date')">
+                            Dia <span id="diaSortSymbol"></span>
+                        </th>
+                        <th onclick="sortTable(1, 'text')">
+                            Bandas <span id="bandasSortSymbol"></span>
+                        </th>
+                        <th onclick="sortTable(2, 'text')">
+                            Local <span id="localSortSymbol"></span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="eventTableBody">
+                    <!-- Rows will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script>
+            const data = [
+                {
+                    dia: "sexta-feira, 31/05/24",
+                    bandas: [
+                        "Henry Freitas",
+                        "Luan Estilizado",
+                        "Wallas Arrais",
+                    ],
+                    local: "Piranhas-AL",
+                },
+                {
+                    dia: "sábado, 1/06/24",
+                    bandas: ["Heitor Costa", "Mathes e Kauan", "Brucelose"],
+                    local: "Piranhas-AL",
+                },
+                {
+                    dia: "domingo, 2/06/24",
+                    bandas: [
+                        "Donas do Bar",
+                        "Jonas Esticado",
+                        "Maiara e Maraisa",
+                    ],
+                    local: "Piranhas-AL",
+                },
+                { dia: "segunda-feira, 3/06/24", bandas: [], local: "" },
+                { dia: "terça-feira, 4/06/24", bandas: [], local: "" },
+                { dia: "quarta-feira, 5/06/24", bandas: [], local: "" },
+                { dia: "quinta-feira, 6/06/24", bandas: [], local: "" },
+                {
+                    dia: "sexta-feira, 7/06/24",
+                    bandas: ["Fabinho Testado", "Felipe Amorim"],
+                    local: "Gloria - BA",
+                },
+                {
+                    dia: "sábado, 8/06/24",
+                    bandas: ["Wallas Arraes", "Taty Girl"],
+                    local: "Gloria - BA",
+                },
+                { dia: "domingo, 9/06/24", bandas: [], local: "" },
+                { dia: "segunda-feira, 10/06/24", bandas: [], local: "" },
+                { dia: "terça-feira, 11/06/24", bandas: [], local: "" },
+                {
+                    dia: "quarta-feira, 12/06/24",
+                    bandas: [
+                        "Iguinho e Lulinha",
+                        "Katia Cilene",
+                        "Maria Clara",
+                    ],
+                    local: "Gloria - BA",
+                },
+                { dia: "quinta-feira, 13/06/24", bandas: [], local: "" },
+                {
+                    dia: "sexta-feira, 14/06/24",
+                    bandas: [
+                        "Primo melo",
+                        "Fabinho testado",
+                        "Heitor Costa",
+                        "Gleydson Gavião",
+                        "Asissão",
+                    ],
+                    local: "Paulo Afonso - BA",
+                },
+                {
+                    dia: "sábado, 15/06/24",
+                    bandas: [
+                        "Moises Nato",
+                        "Adeyse alves",
+                        "Forro do muido",
+                        "Arreio de Ouro",
+                    ],
+                    local: "Paulo Afonso - BA",
+                },
+                {
+                    dia: "domingo, 16/06/24",
+                    bandas: [
+                        "Henry Freitas",
+                        "Mari Fernandas",
+                        "Zezinho da Ema",
+                        "Marcelo Silva",
+                        "Maria Clara",
+                    ],
+                    local: "Jeremoabo-BA",
+                },
+                {
+                    dia: "domingo, 16/06/24",
+                    bandas: [
+                        "Som de 3",
+                        "Kadu Monteiro",
+                        "Estella",
+                        "Priscila Senna",
+                        "Maria Clara",
+                    ],
+                    local: "Paulo Afonso - BA",
+                },
+            ];
+            let sortDirection = {
+                dia: "asc",
+                bandas: "asc",
+                local: "asc",
+            };
+
+            function populateTable(data) {
+                const tbody = document.getElementById("eventTableBody");
+                tbody.innerHTML = "";
+
+                data.forEach((item) => {
+                    const row = document.createElement("tr");
+                    const diaCell = document.createElement("td");
+                    diaCell.textContent = item.dia;
+                    row.appendChild(diaCell);
+
+                    const bandasCell = document.createElement("td");
+                    bandasCell.textContent = item.bandas.join(", ");
+                    row.appendChild(bandasCell);
+
+                    const localCell = document.createElement("td");
+                    localCell.textContent = item.local;
+                    row.appendChild(localCell);
+
+                    tbody.appendChild(row);
+                });
+            }
+
+            function populateFilters(data) {
+                const dias = [...new Set(data.map((item) => item.dia))];
+                const bandas = [
+                    ...new Set(data.flatMap((item) => item.bandas)),
+                ];
+                const locais = [...new Set(data.map((item) => item.local))];
+
+                const diaFilter = document.getElementById("diaFilter");
+                const bandasFilter = document.getElementById("bandasFilter");
+                const localFilter = document.getElementById("localFilter");
+
+                dias.forEach((dia) => {
+                    const option = document.createElement("option");
+                    option.value = dia;
+                    option.textContent = dia;
+                    diaFilter.appendChild(option);
+                });
+
+                bandas.forEach((banda) => {
+                    const option = document.createElement("option");
+                    option.value = banda;
+                    option.textContent = banda;
+                    bandasFilter.appendChild(option);
+                });
+
+                locais.forEach((local) => {
+                    const option = document.createElement("option");
+                    option.value = local;
+                    option.textContent = local;
+                    localFilter.appendChild(option);
+                });
+            }
+
+            function filterData() {
+                const diaFilter = document.getElementById("diaFilter").value;
+                const bandasFilter =
+                    document.getElementById("bandasFilter").value;
+                const localFilter =
+                    document.getElementById("localFilter").value;
+
+                const filteredData = data.filter((item) => {
+                    return (
+                        (diaFilter === "" || item.dia === diaFilter) &&
+                        (bandasFilter === "" ||
+                            item.bandas.includes(bandasFilter)) &&
+                        (localFilter === "" || item.local === localFilter)
+                    );
+                });
+
+                populateTable(filteredData);
+            }
+
+            function sortTable(columnIndex, type) {
+                const table = document.querySelector(".table");
+                const tbody = table.querySelector("tbody");
+                const rows = Array.from(tbody.rows);
+
+                const symbols = {
+                    asc: "▲",
+                    desc: "▼",
+                };
+
+                let compareFunction;
+                if (type === "date") {
+                    compareFunction = (rowA, rowB) => {
+                        const cellA =
+                            rowA.cells[columnIndex].textContent.match(
+                                /\d{2}\/\d{2}\/\d{2}/
+                            )[0];
+                        const cellB =
+                            rowB.cells[columnIndex].textContent.match(
+                                /\d{2}\/\d{2}\/\d{2}/
+                            )[0];
+
+                        const dateA = new Date(
+                            cellA.split("/").reverse().join("-")
+                        );
+                        const dateB = new Date(
+                            cellB.split("/").reverse().join("-")
+                        );
+
+                        return dateA - dateB;
+                    };
+                } else {
+                    compareFunction = (rowA, rowB) => {
+                        const cellA =
+                            rowA.cells[columnIndex].textContent.trim();
+                        const cellB =
+                            rowB.cells[columnIndex].textContent.trim();
+
+                        return cellA.localeCompare(cellB);
+                    };
+                }
+
+                rows.sort(compareFunction);
+                if (sortDirection[type] === "asc") {
+                    tbody.append(...rows);
+                    sortDirection[type] = "desc";
+                } else {
+                    tbody.append(...rows.reverse());
+                    sortDirection[type] = "asc";
+                }
+
+                document
+                    .querySelectorAll("th span")
+                    .forEach((span) => (span.textContent = ""));
+                document.querySelector(`#${type}SortSymbol`).textContent =
+                    symbols[sortDirection[type]];
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                populateTable(data);
+                populateFilters(data);
+
+                document
+                    .getElementById("diaFilter")
+                    .addEventListener("change", filterData);
+                document
+                    .getElementById("bandasFilter")
+                    .addEventListener("change", filterData);
+                document
+                    .getElementById("localFilter")
+                    .addEventListener("change", filterData);
+            });
+        </script>
+    </body>
+</html>
